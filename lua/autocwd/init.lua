@@ -1,12 +1,17 @@
 local plugin = "AutoCWD Plugin"
 
-local nt_api = require("nvim-tree.api")
+local M = {}
+local _config = {}
 
--- By convention, nvim Lua plugins include a setup function that takes a table
--- so that users of the plugin can configure it using this pattern:
---
--- require'myluamodule'.setup({p1 = "value1"})
-local function setup(parameters)
+function M.setup(config)
+  -- Simple variant; could also be more complex with validation, etc.
+  _config = config
+end
+
+
+function M.do_something()
+   local option_x = _config.option_x or 'some_default_value'
+   -- ...
 end
 
 
@@ -24,6 +29,7 @@ local function auto_set_working_directory()
         local str = "Change CWD: "..pwd.." to "..root_dir
         print(str)
         vim.cmd {cmd = 'cd', args = {root_dir} }
+        local nt_api = require("nvim-tree.api")
         nt_api.tree.change_root(root_dir)
         vim.notify(str, "info", { 
             title = plugin,
@@ -31,7 +37,7 @@ local function auto_set_working_directory()
     end
 end
 
--- Create a command, ':Aw'
+-- Create a command, ':AutoCWD'
 vim.api.nvim_create_user_command(
     'AutoCWD',
     auto_set_working_directory,
@@ -40,17 +46,4 @@ vim.api.nvim_create_user_command(
 
 vim.keymap.set('n', '<leader>aw', auto_set_working_directory, {desc = 'Auto set working directory.', remap = false})
 
-
--- Returning a Lua table at the end allows fine control of the symbols that
--- will be available outside this file. Returning the table also allows the
--- importer to decide what name to use for this module in their own code.
---
--- Examples of how this module can be imported:
---    local mine = require('myluamodule')
---    mine.local_lua_function()
---    local myluamodule = require('myluamodule')
---    myluamodule.local_lua_function()
---    require'myluamodule'.setup({p1 = "value1"})
-return {
-    setup = setup,
-}
+return M
